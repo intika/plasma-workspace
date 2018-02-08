@@ -25,6 +25,7 @@
 #include <QQmlContext>
 #include <QScreen>
 #include <qopenglshaderprogram.h>
+#include <QQuickItem>
 
 #include <kwindowsystem.h>
 #include <klocalizedstring.h>
@@ -195,6 +196,17 @@ DesktopView::SessionType DesktopView::sessionType() const
     } else {
         return ApplicationSession;
     }
+}
+
+QQuickItem *DesktopView::containmentItemForActivity(const QString &activity)
+{
+    if (ShellCorona *c = qobject_cast<ShellCorona*>(corona())) {
+        Plasma::Containment *cont = c->containmentGraphicsItemPreview(activity, containment()->screen());
+        if (cont) {
+            return cont->property("_plasma_graphicObject").value<QQuickItem *>();
+        }
+    }
+    return nullptr;
 }
 
 bool DesktopView::event(QEvent *e)

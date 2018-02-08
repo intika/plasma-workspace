@@ -99,6 +99,8 @@ public:
 
     void removeDesktop(DesktopView *desktopView);
 
+    Plasma::Containment *containmentGraphicsItemPreview(const QString& activity, int screenNum);
+
     /**
      * @returns a new containment associated with the specified @p activity and @p screen.
      */

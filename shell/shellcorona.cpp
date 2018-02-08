@@ -1231,6 +1231,18 @@ void ShellCorona::addOutput(QScreen* screen)
     CHECK_SCREEN_INVARIANTS
 }
 
+Plasma::Containment *ShellCorona::containmentGraphicsItemPreview(const QString& activity, int screenNum)
+{
+    if (m_desktopContainments.contains(activity)) {
+        for (Plasma::Containment *cont : m_desktopContainments.value(activity)) {
+            if (!cont->destroyed() && cont->lastScreen() == screenNum && cont->activity() == activity) {
+                return cont;
+            }
+        }
+    }
+    return nullptr;
+}
+
 Plasma::Containment *ShellCorona::createContainmentForActivity(const QString& activity, int screenNum)
 {
     if (m_desktopContainments.contains(activity)) {

@@ -72,6 +72,14 @@ public:
 
     SessionType sessionType() const;
 
+    /**
+     * Returns the graphic object for the containment that corresponds to
+     * a given activity in the same screen as us,
+     * It's not guaranteed to return a valid pointer and it may led to the graphic object
+     * initialization, so it's potentially memory and cpu intensive, use with care
+     */
+    Q_INVOKABLE QQuickItem *containmentItemForActivity(const QString &activity);
+
 protected:
     bool event(QEvent *e) override;
     void keyPressEvent(QKeyEvent *e) override;
@@ -81,6 +89,8 @@ protected Q_SLOTS:
      * It will be called when the configuration is requested
      */
     void showConfigurationInterface(Plasma::Applet *applet) override;
+
+    
 
 private Q_SLOTS:
     void screenGeometryChanged();

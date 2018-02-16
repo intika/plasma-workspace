@@ -19,7 +19,7 @@
  */
 
 import QtQuick 2.5
-import QtQuick.Controls 2.3 as QQC2
+import QtQuick.Controls 2.1 as QQC2
 import QtQuick.Window 2.2
 import QtGraphicalEffects 1.0
 import org.kde.plasma.wallpapers.image 2.0 as Wallpaper
@@ -34,6 +34,9 @@ QQC2.StackView {
     readonly property string configColor: wallpaper.configuration.Color
     readonly property bool blur: wallpaper.configuration.Blur
     readonly property size sourceSize: Qt.size(root.width * Screen.devicePixelRatio, root.height * Screen.devicePixelRatio)
+
+    // holds the image instance we're about to push onto the stack when it's finished loading
+    property Item pendingImageItem: null
 
     //public API, the C++ part will look for those
     function setUrl(url) {
@@ -59,7 +62,7 @@ QQC2.StackView {
             wallpaper.setAction("open", i18nd("plasma_applet_org.kde.image", "Open Wallpaper Image"), "document-open");
             wallpaper.setAction("next", i18nd("plasma_applet_org.kde.image","Next Wallpaper Image"),"user-desktop");
         }
-        loadImage();
+        Qt.callLater(loadImage);
     }
 
     Wallpaper.Image {
@@ -71,50 +74,73 @@ QQC2.StackView {
         slideTimer: wallpaper.configuration.SlideInterval
     }
 
-    Timer {
-        id: loadTimer
-        interval: 0 //FIXME DAVE - this is unmergable rubbish
-        running: false
-        onTriggered: loadImage()
-    }
-    onFillModeChanged: loadTimer.start();
-    onModelImageChanged: loadTimer.start();
-    onConfigColorChanged: loadTimer.start();
-    onBlurChanged: loadTimer.start();
-    onWidthChanged: loadTimer.start();
-    onHeightChanged: loadTimer.start();
+    onFillModeChanged: Qt.callLater(loadImage);
+    onModelImageChanged: Qt.callLater(loadImage);
+    onConfigColorChanged: Qt.callLater(loadImage);
+    onBlurChanged: Qt.callLater(loadImage);
+    onWidthChanged: Qt.callLater(loadImage);
+    onHeightChanged: Qt.callLater(loadImage);
 
     function loadImage() {
-        console.log("PUSHING", root.modelImage); //FIXME  we end up doing this twice on boot.
-        root.replace(baseImage,
-                    {//copy current config options, do not bind. Then we animate when we change anything
-                        "source": root.modelImage,
-                        "fillMode": root.fillMode,
-                        "sourceSize": root.sourceSize,
-                        "color": root.configColor,
-                        "blur": root.blur,
-                        "opacity": 0},
-                    root.currentItem ? QQC2.StackView.Transition : QQC2.StackView.Immediate);//dont' animate first show
+        console.log("About to load image", root.modelImage);
+        if (pendingImageItem) {
+            console.warn("Loading new image while already in the process of loading one");
+            // Is this soon enough so it breaks our statusChanged binding before we w
+            pendingImageItem.destroy();
+            pendingImageItem = null;
+        }
+
+        var isStartup = !root.currentItem;
+
+        var imageItem = baseImage.createObject(root, {
+            //copy current config options, do not bind. Then we animate when we change anything
+            source: root.modelImage,
+            fillMode: root.fillMode,
+            sourceSize: root.sourceSize,
+            color: root.configColor,
+            blur: root.blur,
+            opacity: isStartup ? 1 : 0 // don't animate first show
+        });
+
+        imageItem.statusChanged.connect(function () {
+            // animate only once image has been loaded or failed to
+            if (imageItem.status !== Image.Loading) {
+                console.log("Now transitioning to image", root.modelImage);
+                root.replace(imageItem, isStartup ? QQC2.StackView.Immediate : QQC2.StackView.Transition);
+                // need to unset it again or else it destroys the old image before the transition
+                pendingImageItem = null;
+            }
+        });
+
+        pendingImageItem = imageItem;
     }
 
     Component {
         id: baseImage
 
-        Image {
-            id: mainImage
+        Item {
+            id: imageContainer
+
+            property alias source: mainImage.source
+            property alias fillMode: mainImage.fillMode
+            property alias sourceSize: mainImage.sourceSize
             property alias color: backgroundColor.color
             property alias blur: blurEffect.visible
 
-            asynchronous: true
-            cache: false
-            source: imageA.source
-            z: -1
+            property alias status: mainImage.status
+
+            QQC2.StackView.onRemoved: destroy()
 
             Rectangle {
                 id: backgroundColor
                 anchors.fill: parent
-                visible: mainImage.status === Image.Ready
-                z: -2
+            }
+
+            Image {
+                id: mainImage
+                anchors.fill: parent
+                asynchronous: true
+                cache: false
             }
 
             GaussianBlur {
@@ -123,7 +149,6 @@ QQC2.StackView {
                 source: mainImage
                 radius: 32
                 samples: 65
-                z: mainImage.z
             }
         }
     }
@@ -135,10 +160,10 @@ QQC2.StackView {
             duration: wallpaper.configuration.TransitionAnimationDuration
         }
     }
-    replaceExit: Transition {
-        OpacityAnimator {
-            from: 1
-            to: 0
+    // Keep the old image around till the new one is fully faded in
+    // If we fade both at the same time you can see the background behind glimpse through
+    replaceExit: Transition{
+        PauseAnimation {
             duration: wallpaper.configuration.TransitionAnimationDuration
         }
     }

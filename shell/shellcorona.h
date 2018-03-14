@@ -99,6 +99,10 @@ public:
 
     void removeDesktop(DesktopView *desktopView);
 
+    /**
+     * this returns if available the graphics item for a containment of another activity, but belonging to the same screen, it is guaranteed to not steal the containment from other views.
+     * This is used for more fancy activity switching ui, such as the swipe gesture used in Plasma Mobile
+     */
     Plasma::Containment *containmentGraphicsItemPreview(const QString& activity, int screenNum);
 
     /**

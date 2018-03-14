@@ -1225,6 +1225,11 @@ void ShellCorona::addOutput(QScreen* screen)
         m_waitingPanelsTimer.start();
     }
 
+    QStringList existingActivities = m_activityController->activities();
+    for (const auto &id : existingActivities) {
+        view->activitiesModel()->addActivity(id, containmentGraphicsItemPreview(id, containment->screen()));
+    }
+
     emit availableScreenRectChanged();
     emit screenAdded(m_screenPool->id(screen->name()));
 
@@ -1563,6 +1568,9 @@ void ShellCorona::activityAdded(const QString &id)
     }
 
     m_activityContainmentPlugins.insert(id, defaultContainmentPlugin());
+    for (const auto desktopView : m_desktopViewforId) {
+        desktopView->activitiesModel()->addActivity(id, containmentGraphicsItemPreview(id, desktopView->containment()->screen()));
+    }
 }
 
 void ShellCorona::activityRemoved(const QString &id)

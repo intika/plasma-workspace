@@ -23,6 +23,7 @@
 #include <PlasmaQuick/ContainmentView>
 #include <PlasmaQuick/ConfigView>
 #include <QPointer>
+#include <QStandardItemModel>
 
 namespace KWayland
 {
@@ -32,6 +33,25 @@ namespace KWayland
     }
 }
 
+class ActivitiesModel : public QStandardItemModel {
+    Q_OBJECT
+public:
+    enum ActivityRoles {
+        Id = Qt::UserRole + 1,
+        Name,
+        Current,
+        Containment
+    };
+    Q_ENUM(ActivityRoles)
+
+    ActivitiesModel(QObject *parent = nullptr);
+    ~ActivitiesModel();
+
+    void addActivity(const QString &id, Plasma::Containment *containment);
+
+    QHash<int, QByteArray> roleNames() const override;
+};
+
 class DesktopView : public PlasmaQuick::ContainmentView
 {
     Q_OBJECT
@@ -40,6 +60,8 @@ class DesktopView : public PlasmaQuick::ContainmentView
 
     //What kind of plasma session we're in: are we in a full workspace, an application?...
     Q_PROPERTY(SessionType sessionType READ sessionType CONSTANT)
+
+    Q_PROPERTY(ActivitiesModel *activities READ activitiesModel CONSTANT)
 public:
     enum WindowType {
         Window, /** The window is a normal resizable window with titlebar and appears in the taskbar */
@@ -71,6 +93,8 @@ public:
     void setWindowType(WindowType type);
 
     SessionType sessionType() const;
+
+    ActivitiesModel *activitiesModel() const;
 
     /**
      * Returns the graphic object for the containment that corresponds to
@@ -109,6 +133,7 @@ private:
     QPointer<QScreen> m_screenToFollow;
     WindowType m_windowType;
     KWayland::Client::PlasmaShellSurface *m_shellSurface;
+    ActivitiesModel *m_activitiesModel;
 };
 
 #endif // DESKTOVIEW_H

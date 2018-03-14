@@ -25,7 +25,6 @@
 #include <QTest>
 #include <kio/job.h>
 #include <kio/copyjob.h>
-#include <kio_version.h>
 
 class TestDesktop : public QObject
 {
@@ -64,7 +63,7 @@ private Q_SLOTS:
         QString fileName = tempFile.fileName();
         tempFile.close();
         KIO::Job* job = KIO::file_copy(QUrl::fromLocalFile(fileName), QUrl("desktop:/" + m_testFileName), -1, KIO::HideProgressInfo);
-        job->setUiDelegate(0);
+        job->setUiDelegate(nullptr);
         QVERIFY(job->exec());
         QVERIFY(QFile::exists(m_desktopPath + '/' + m_testFileName));
     }
@@ -98,15 +97,11 @@ private Q_SLOTS:
         QVERIFY(!linkJob->exec());
         QCOMPARE(linkJob->error(), (int)KIO::ERR_FILE_ALREADY_EXIST);
 
-#if KIO_VERSION >= QT_VERSION_CHECK(5, 31, 0)  // fixed since 5.30.0, actually, but playing it safe for pre-5.30-users
         // Now try changing the link target, with Overwrite (bug 360487)
         linkJob = KIO::symlink(m_testFileName + "3", desktopLink, KIO::Overwrite | KIO::HideProgressInfo);
         QVERIFY(linkJob->exec());
         QVERIFY(QFileInfo(localLink).isSymLink());
         QCOMPARE(QFileInfo(localLink).symLinkTarget(), source + "3");
-#else
-        QSKIP("Skipping symlink+Overwrite test, fixed in KIO 5.30.0");
-#endif
     }
 
     void testRename_data()
@@ -151,7 +146,7 @@ private Q_SLOTS:
         QVERIFY(!QFile::exists(destFilePath));
 
         KIO::Job* job = KIO::rename(srcUrl, destUrl, KIO::HideProgressInfo);
-        job->setUiDelegate(0);
+        job->setUiDelegate(nullptr);
         QVERIFY(job);
         bool ok = job->exec();
         QVERIFY(ok);

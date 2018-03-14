@@ -43,30 +43,14 @@ int main(int argc, char **argv)
     qunsetenv("QT_DEVICE_PIXEL_RATIO");
     QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
 
-    KLocalizedString::setApplicationDomain("krunner");
-
     QQuickWindow::setDefaultAlphaBuffer(true);
     QApplication app(argc, argv);
+    KLocalizedString::setApplicationDomain("krunner");
 
     KQuickAddons::QtQuickSettings::init();
 
 //     TODO: Make it a QGuiApplication once we don't depend on KDELibs4Support
 //     QGuiApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("krunner"));
-    app.setOrganizationDomain(QStringLiteral("kde.org"));
-    app.setApplicationVersion(QStringLiteral(PROJECT_VERSION));
-    app.setQuitOnLastWindowClosed(false);
-    parser.setApplicationDescription(i18n("Run Command interface"));
-
-    parser.addHelpOption();
-    parser.addVersionOption();
-    parser.process(app);
-
-    if (!KAuthorized::authorize(QStringLiteral("run_command"))) {
-        return -1;
-    }
-
-    KDBusService service(KDBusService::Unique);
 
     KAboutData aboutData(QStringLiteral("krunner"),
         i18n("krunner"),
@@ -75,6 +59,20 @@ int main(int argc, char **argv)
         KAboutLicense::GPL);
 
     KAboutData::setApplicationData(aboutData);
+    app.setQuitOnLastWindowClosed(false);
+
+    aboutData.setupCommandLine(&parser);
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
+
+    if (!KAuthorized::authorize(QStringLiteral("run_command"))) {
+        return -1;
+    }
+
+    KDBusService service(KDBusService::Unique);
 
     QGuiApplication::setFallbackSessionManagementEnabled(false);
 

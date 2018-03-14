@@ -31,7 +31,6 @@
 #include <KRun>
 #include <KService>
 #include <KServiceTypeTrader>
-#include <kcoreaddons_version.h>
 #include <KStringHandler>
 
 #include "debug.h"
@@ -470,7 +469,7 @@ QMimeData * ServiceRunner::mimeDataForMatch(const Plasma::QueryMatch &match)
         return result;
     }
 
-    return 0;
+    return nullptr;
 }
 
 K_EXPORT_PLASMA_RUNNER(services, ServiceRunner)

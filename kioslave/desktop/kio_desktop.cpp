@@ -25,7 +25,6 @@
 #include <KLocalizedString>
 
 #include <kio/udsentry.h>
-#include <kio_version.h>
 
 #include <QCoreApplication>
 #include <QFile>
@@ -83,10 +82,6 @@ void DesktopProtocol::checkLocalInstall()
         QFile::copy(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("kio_desktop/directory.desktop")),
                     desktopPath + "/.directory");
 
-        // Copy the trash link
-        QFile::copy(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QStringLiteral("kio_desktop/directory.trash")),
-                    desktopPath + "/trash.desktop");
- 
         // Copy the desktop links
         QSet<QString> links;
         const auto dirs = QStandardPaths::locateAll(QStandardPaths::GenericDataLocation, QStringLiteral("kio_desktop/DesktopLinks"), QStandardPaths::LocateDirectory);
@@ -219,11 +214,7 @@ void DesktopProtocol::rename(const QUrl &_src, const QUrl &_dest, KIO::JobFlags 
     }
 
     if (QFile(srcPath).rename(destPath)) {
-#if KIO_VERSION >= QT_VERSION_CHECK(5, 20, 0)
         org::kde::KDirNotify::emitFileRenamedWithLocalPath(_src, _dest, destPath);
-#else
-        org::kde::KDirNotify::emitFileRenamed(_src, _dest);
-#endif
         finished();
     } else {
         error(KIO::ERR_CANNOT_RENAME, srcPath);

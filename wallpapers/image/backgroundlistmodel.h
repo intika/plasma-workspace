@@ -44,7 +44,7 @@ class ImageSizeFinder : public QObject, public QRunnable
 {
     Q_OBJECT
     public:
-        ImageSizeFinder(const QString &path, QObject *parent = nullptr);
+        explicit ImageSizeFinder(const QString &path, QObject *parent = nullptr);
         void run() override;
 
     Q_SIGNALS:
@@ -88,7 +88,7 @@ public:
     Q_INVOKABLE int indexOf(const QString &path) const;
     virtual bool contains(const QString &bg) const;
 
-    int count() const {return m_packages.size();};
+    int count() const {return m_packages.size();}
 
     Q_INVOKABLE void openContainingFolder(int rowIndex);
     Q_INVOKABLE void setPendingDeletion(int rowIndex, bool pendingDeletion);

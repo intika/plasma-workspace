@@ -81,11 +81,6 @@ MouseEventListener {
         }
     }
 
-    PlasmaCore.Svg {
-        id: configIconsSvg
-        imagePath: "widgets/configuration-icons"
-    }
-
     PlasmaExtras.Heading {
         width: parent.width
         level: 3
@@ -133,7 +128,8 @@ MouseEventListener {
     }
 
     function action_clearNotifications() {
-        notifications.clearNotifications()
+        notifications.clearNotifications();
+        notifications.clearHistory();
     }
 
     function action_notificationskcm() {
@@ -144,7 +140,7 @@ MouseEventListener {
         plasmoid.setAction("clearNotifications", i18n("Clear Notifications"), "edit-clear")
         var clearAction = plasmoid.action("clearNotifications");
         clearAction.visible = Qt.binding(function() {
-            return notificationsApplet.notifications && notificationsApplet.notifications.count > 0
+            return notificationsApplet.notifications && (notificationsApplet.notifications.count > 0 || notificationsApplet.notifications.historyCount > 0);
         })
 
         if (KCMShell.authorize("kcmnotify.desktop").length > 0) {

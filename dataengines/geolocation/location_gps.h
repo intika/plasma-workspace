@@ -29,8 +29,8 @@ class Gpsd : public QThread
 {
     Q_OBJECT
 public:
-    Gpsd(gps_data_t* gpsdata);
-    virtual ~Gpsd();
+    explicit Gpsd(gps_data_t* gpsdata);
+    ~Gpsd() override;
 
     void update();
 
@@ -38,7 +38,7 @@ Q_SIGNALS:
     void dataReady(const Plasma::DataEngine::Data& data);
 
 protected:
-    virtual void run();
+    void run() override;
 
 private:
     gps_data_t* m_gpsdata;
@@ -51,10 +51,10 @@ class Gps : public GeolocationProvider
 {
     Q_OBJECT
 public:
-    explicit Gps(QObject *parent = 0, const QVariantList &args = QVariantList());
-    ~Gps();
+    explicit Gps(QObject *parent = nullptr, const QVariantList &args = QVariantList());
+    ~Gps() override;
 
-    void update();
+    void update() override;
 
 private:
     Gpsd* m_gpsd;

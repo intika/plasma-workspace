@@ -30,16 +30,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <QQuickItem>
 #include <QTimer>
 #include <QFile>
-#include <QtDBus/QDBusConnection>
-#include <QtDBus/QDBusMessage>
-#include <QtDBus/QDBusPendingCall>
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDBusPendingCall>
 #include <QQuickView>
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQmlPropertyMap>
 #include <QPainter>
 #include <QStandardPaths>
-#include <QtX11Extras/qx11info_x11.h>
+#include <QX11Info>
 #include <QScreen>
 #include <QStandardPaths>
 
@@ -145,7 +145,6 @@ KSMShutdownDlg::KSMShutdownDlg( QWindow* parent,
     // engine stuff
     KDeclarative::KDeclarative kdeclarative;
     kdeclarative.setDeclarativeEngine(engine());
-    kdeclarative.initialize();
     kdeclarative.setupBindings();
 //    windowContainer->installEventFilter(this);
 }
@@ -301,10 +300,10 @@ void KSMShutdownDlg::slotSuspend(int spdMethod)
     switch (spdMethod) {
         case Solid::PowerManagement::StandbyState:
         case Solid::PowerManagement::SuspendState:
-            Solid::PowerManagement::requestSleep(Solid::PowerManagement::SuspendState, 0, 0);
+            Solid::PowerManagement::requestSleep(Solid::PowerManagement::SuspendState, nullptr, nullptr);
             break;
         case Solid::PowerManagement::HibernateState:
-            Solid::PowerManagement::requestSleep(Solid::PowerManagement::HibernateState, 0, 0);
+            Solid::PowerManagement::requestSleep(Solid::PowerManagement::HibernateState, nullptr, nullptr);
             break;
     }
     reject();

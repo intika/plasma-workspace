@@ -32,7 +32,7 @@ class PlasmaAppletItemModel;
 class PlasmaAppletItem : public KCategorizedItemsViewModels::AbstractItem
 {
 public:
-    PlasmaAppletItem(const KPluginInfo& info);
+    explicit PlasmaAppletItem(const KPluginInfo& info);
 
     QString pluginName() const;
     QString name() const override;
@@ -83,7 +83,7 @@ public:
         ScreenshotRole = Qt::UserRole+12
     };
 
-    explicit PlasmaAppletItemModel(QObject * parent = 0);
+    explicit PlasmaAppletItemModel(QObject * parent = nullptr);
 
     QStringList mimeTypes() const override;
     QSet<QString> categories() const;

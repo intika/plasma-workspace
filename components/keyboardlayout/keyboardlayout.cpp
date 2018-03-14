@@ -19,15 +19,15 @@
 
 #include "keyboardlayout.h"
 
-#include <QtDBus/QDBusInterface>
-#include <QtDBus/QDBusReply>
+#include <QDBusInterface>
+#include <QDBusReply>
 
 #include <QDebug>
 #include "debug.h"
 
 KeyboardLayout::KeyboardLayout(QObject* parent)
     : QObject(parent)
-    , mIface(0)
+    , mIface(nullptr)
 {
     mIface = new QDBusInterface(QStringLiteral("org.kde.keyboard"),
                                 QStringLiteral("/Layouts"),
@@ -36,7 +36,7 @@ KeyboardLayout::KeyboardLayout(QObject* parent)
                                 this);
     if (!mIface->isValid()) {
           delete mIface;
-          mIface = 0;
+          mIface = nullptr;
           return;
     }
 

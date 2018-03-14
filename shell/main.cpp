@@ -52,13 +52,14 @@ int main(int argc, char *argv[])
     if (!qEnvironmentVariableIsSet("PLASMA_USE_QT_SCALING")) {
         qunsetenv("QT_DEVICE_PIXEL_RATIO");
         QCoreApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+    } else {
+        QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     }
 
     QQuickWindow::setDefaultAlphaBuffer(true);
 
-    KLocalizedString::setApplicationDomain("plasmashell");
-
     QApplication app(argc, argv);
+    KLocalizedString::setApplicationDomain("plasmashell");
 
     // The executable's path is added to the library/plugin paths.
     // This does not make much sense for plasmashell.

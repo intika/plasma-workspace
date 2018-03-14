@@ -207,15 +207,10 @@ void AppMenuApplet::trigger(QQuickItem *ctx, int idx)
             actionMenu->installEventFilter(this);
         }
 
-        setStatus(Plasma::Types::AcceptingInputStatus);
         actionMenu->winId();//create window handle
         actionMenu->windowHandle()->setTransientParent(ctx->window());
 
         actionMenu->popup(pos);
-
-        //we can return to passive immediately, an autohide panel will stay open whilst
-        //any transient window is showing
-        setStatus(Plasma::Types::PassiveStatus);
 
         if (view() == FullView) {
             // hide the old menu only after showing the new one to avoid brief flickering
@@ -223,6 +218,8 @@ void AppMenuApplet::trigger(QQuickItem *ctx, int idx)
             QMenu *oldMenu = m_currentMenu;
             m_currentMenu = actionMenu;
             if (oldMenu && oldMenu != actionMenu) {
+                //dont initialize the currentIndex when another menu is already shown
+                disconnect(oldMenu, &QMenu::aboutToHide, this, &AppMenuApplet::onMenuAboutToHide);
                 oldMenu->hide();
             }
         }
@@ -231,7 +228,13 @@ void AppMenuApplet::trigger(QQuickItem *ctx, int idx)
 
         // FIXME TODO connect only once
         connect(actionMenu, &QMenu::aboutToHide, this, &AppMenuApplet::onMenuAboutToHide, Qt::UniqueConnection);
-        return;
+    } else { // is it just an action without a menu?
+        const QVariant data = m_model->index(idx, 0).data(AppMenuModel::ActionRole);
+        QAction *action = static_cast<QAction *>(data.value<void *>());
+        if (action) {
+            Q_ASSERT(!action->menu());
+            action->trigger();
+        }
     }
 }
 

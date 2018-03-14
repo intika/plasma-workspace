@@ -83,7 +83,6 @@ KSMSwitchUserDialog::KSMSwitchUserDialog(KDisplayManager *dm, KWayland::Client::
 
     KDeclarative::KDeclarative kdeclarative;
     kdeclarative.setDeclarativeEngine(engine());
-    kdeclarative.initialize();
     kdeclarative.setupBindings();
 }
 
@@ -166,5 +165,7 @@ void KSMSwitchUserDialog::setupWaylandIntegration()
 
 void KSMSwitchUserDialog::ungrab()
 {
+    // Allow the screenlocker to grab them immediately
     setKeyboardGrabEnabled(false);
+    setMouseGrabEnabled(false);
 }

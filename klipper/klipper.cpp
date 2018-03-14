@@ -502,7 +502,7 @@ void Klipper::saveSession()
 
 void Klipper::disableURLGrabber()
 {
-    KMessageBox::information( 0L,
+    KMessageBox::information( nullptr,
                               i18n( "You can enable URL actions later by left-clicking on the "
                                     "Klipper icon and selecting 'Enable Clipboard Actions'" ) );
 
@@ -934,16 +934,26 @@ void Klipper::showBarcode(const QSharedPointer< const HistoryItem > &item)
     QWidget* mw = new QWidget(dlg);
     QHBoxLayout* layout = new QHBoxLayout(mw);
 
-    AbstractBarcode *qrCode = createBarcode(QRCode);
-    AbstractBarcode *dataMatrix = createBarcode(DataMatrix);
-    if (item) {
-        qrCode->setData(item->text());
-        dataMatrix->setData(item->text());
+    {
+        AbstractBarcode *qrCode = createBarcode(QRCode);
+        if (qrCode) {
+            if(item) {
+                qrCode->setData(item->text());
+            }
+            BarcodeLabel *qrCodeLabel = new BarcodeLabel(qrCode, mw);
+            layout->addWidget(qrCodeLabel);
+        }
     }
-    BarcodeLabel *qrCodeLabel = new BarcodeLabel(qrCode, mw);
-    BarcodeLabel *dataMatrixLabel = new BarcodeLabel(dataMatrix, mw);
-    layout->addWidget(qrCodeLabel);
-    layout->addWidget(dataMatrixLabel);
+    {
+        AbstractBarcode *dataMatrix = createBarcode(DataMatrix);
+        if (dataMatrix) {
+            if (item) {
+                dataMatrix->setData(item->text());
+            }
+            BarcodeLabel *dataMatrixLabel = new BarcodeLabel(dataMatrix, mw);
+            layout->addWidget(dataMatrixLabel);
+       }
+    }
 
     mw->setFocus();
     QVBoxLayout *vBox = new QVBoxLayout(dlg);

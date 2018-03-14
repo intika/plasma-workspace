@@ -34,7 +34,7 @@ class ScreenPool : public QObject, public QAbstractNativeEventFilter
     Q_OBJECT
 
 public:
-    ScreenPool(KSharedConfig::Ptr config, QObject *parent = nullptr);
+    explicit ScreenPool(KSharedConfig::Ptr config, QObject *parent = nullptr);
     void load();
     ~ScreenPool() override;
 
@@ -65,6 +65,7 @@ private:
     QHash<QString, int> m_idForConnector;
 
     QTimer m_configSaveTimer;
+    int m_xrandrExtensionOffset;
 };
 
 #endif // SCREENPOOL_H

@@ -1,6 +1,8 @@
 add_definitions(-DTRANSLATION_DOMAIN=\"systemmonitor\")
 
 add_definitions("-DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII")
+# clear setting pulled in from finding KF5::KDELibs4Support before resetting
+remove_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0)
 add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x060000)
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 
@@ -32,4 +34,4 @@ target_link_libraries(systemmonitor
 )
 
 install(TARGETS systemmonitor DESTINATION ${KDE_INSTALL_BINDIR})
-install(PROGRAMS org.kde.systemmonitor.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
+install(PROGRAMS org.kde.systemmonitor.desktop DESTINATION ${KDE_INSTALL_APPDIR})

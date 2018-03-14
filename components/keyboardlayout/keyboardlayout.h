@@ -20,8 +20,8 @@
 #ifndef KEYBOARDLAYOUT_H
 #define KEYBOARDLAYOUT_H
 
-#include <QtCore/QObject>
-#include <QtCore/QStringList>
+#include <QObject>
+#include <QStringList>
 
 class QDBusInterface;
 class QDBusPendingCallWatcher;
@@ -44,7 +44,7 @@ class KeyboardLayout : public QObject
                NOTIFY layoutsChanged)
 
 public:
-    KeyboardLayout(QObject *parent = nullptr);
+    explicit KeyboardLayout(QObject *parent = nullptr);
     ~KeyboardLayout() override;
 
     QString currentLayout() const;

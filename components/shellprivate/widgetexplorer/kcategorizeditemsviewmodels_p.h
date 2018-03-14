@@ -20,9 +20,10 @@
 #ifndef PLASMA_KCATEGORIZEDITEMSVIEWMODELS_P_H
 #define PLASMA_KCATEGORIZEDITEMSVIEWMODELS_P_H
 
-#include <QtGui/QtGui>
-#include <QtCore/QtCore>
 #include <QIcon>
+#include <QPair>
+#include <QStandardItem>
+#include <QSortFilterProxyModel>
 
 namespace KCategorizedItemsViewModels {
 
@@ -93,7 +94,7 @@ public:
         FilterDataRole = Qt::UserRole+2,
         SeparatorRole = Qt::UserRole+3
     };
-    DefaultFilterModel(QObject *parent = nullptr);
+    explicit DefaultFilterModel(QObject *parent = nullptr);
 
     QHash<int, QByteArray> roleNames() const override;
 
@@ -130,7 +131,7 @@ class DefaultItemFilterProxyModel : public QSortFilterProxyModel
     Q_PROPERTY(int count READ count NOTIFY countChanged)
 
 public:
-    DefaultItemFilterProxyModel(QObject *parent = nullptr);
+    explicit DefaultItemFilterProxyModel(QObject *parent = nullptr);
 
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
     bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;

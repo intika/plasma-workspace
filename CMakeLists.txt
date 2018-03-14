@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(plasma-workspace)
+
 set(PROJECT_VERSION "5.12.80")
 set(PROJECT_VERSION_MAJOR 5)
 
@@ -165,6 +166,8 @@ add_subdirectory(solidautoeject)
 
 ecm_optional_add_subdirectory(xembed-sni-proxy)
 
+ecm_optional_add_subdirectory(gmenu-dbusmenu-proxy)
+
 add_subdirectory(soliduiserver)
 
 if(KF5Holidays_FOUND)
@@ -173,4 +176,5 @@ endif()
 
 add_subdirectory(templates)
 
+install( FILES plasma-workspace.categories  DESTINATION ${KDE_INSTALL_CONFDIR} )
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)

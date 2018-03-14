@@ -24,6 +24,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
+#include <QFileInfo>
 #include <QList>
 #include <QTimer>
 
@@ -37,6 +38,8 @@
 
 #include <KMessageBox>
 #include <KLocalizedString>
+
+#include <KDeclarative/QmlObjectSharedEngine>
 
 static const QStringList s_shellsDirs(QStandardPaths::locateAll(QStandardPaths::QStandardPaths::GenericDataLocation,
                                                   PLASMA_RELATIVE_DATA_INSTALL_DIR "/shells/",
@@ -55,7 +58,7 @@ class ShellManager::Private {
 public:
     Private()
         : currentHandler(nullptr),
-          corona(0)
+          corona(nullptr)
     {
         shellUpdateDelay.setInterval(100);
         shellUpdateDelay.setSingleShot(true);
@@ -92,28 +95,21 @@ void ShellManager::loadHandlers()
         d->corona, &ShellCorona::setShell
     );
 
-    // TODO: Use corona's qml engine when it switches from QScriptEngine
-    static QQmlEngine * engine = new QQmlEngine(this);
-
-    for (const QString &shellsDir: s_shellsDirs) {
-        for (const auto & dir: QDir(shellsDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    for (const QString &shellsDir : qAsConst(s_shellsDirs)) {
+        const auto dirs = QDir(shellsDir).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+        for (const auto &dir : dirs) {
             const QString qmlFile = shellsDir + dir + s_shellLoaderPath;
             // qDebug() << "Making a new instance of " << qmlFile;
 
             //this shell is not valid, ignore it
-            if (!QFile::exists(qmlFile)) {
+            if (!QFileInfo::exists(qmlFile)) {
                 continue;
             }
 
-            QQmlComponent handlerComponent(engine,
-                    QUrl::fromLocalFile(qmlFile)
-                );
-            auto handler = handlerComponent.create();
+            auto *handlerContainer = new KDeclarative::QmlObjectSharedEngine(this);
+            handlerContainer->setSource(QUrl::fromLocalFile(qmlFile));
 
-            // Writing out the errors
-            for (const auto & error: handlerComponent.errors()) {
-                qWarning() << "Error: " << error;
-            }
+            QObject *handler = handlerContainer->rootObject();
 
             if (handler) {
                 handler->setProperty("pluginName", dir);
@@ -174,14 +170,14 @@ void ShellManager::updateShell()
     d->shellUpdateDelay.stop();
 
     if (d->handlers.isEmpty()) {
-        KMessageBox::error(0, //wID, but we don't have a window yet
+        KMessageBox::error(nullptr, //wID, but we don't have a window yet
                            i18nc("Fatal error message body","All shell packages missing.\nThis is an installation issue, please contact your distribution"),
                            i18nc("Fatal error message title", "Plasma Cannot Start"));
         qCritical("We have no shell handlers installed");
         QCoreApplication::exit(-1);
     }
 
-    QObject *handler = 0;
+    QObject *handler = nullptr;
 
     if (!s_fixedShell.isEmpty()) {
         QList<QObject *>::const_iterator it = std::find_if (d->handlers.cbegin(), d->handlers.cend(), [=] (QObject *handler) {
@@ -190,7 +186,7 @@ void ShellManager::updateShell()
         if (it != d->handlers.cend()) {
             handler = *it;
         } else {
-            KMessageBox::error(0,
+            KMessageBox::error(nullptr,
                                i18nc("Fatal error message body", "Shell package %1 cannot be found", s_fixedShell),
                                i18nc("Fatal error message title", "Plasma Cannot Start"));
             qCritical("Unable to find the shell plugin '%s'", qPrintable(s_fixedShell));

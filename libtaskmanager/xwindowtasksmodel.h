@@ -53,7 +53,7 @@ class TASKMANAGER_EXPORT XWindowTasksModel : public AbstractWindowTasksModel
 
 public:
     explicit XWindowTasksModel(QObject *parent = nullptr);
-    virtual ~XWindowTasksModel();
+    ~XWindowTasksModel() override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -219,7 +219,7 @@ public:
      * @param mimeData Some mime data.
      * @param @ok Set to true or false on success or failure.
      */
-    static WId winIdFromMimeData(const QMimeData *mimeData, bool *ok = 0);
+    static WId winIdFromMimeData(const QMimeData *mimeData, bool *ok = nullptr);
 
     /**
      * Tries to extract X11 window ids from supplied mime data.
@@ -227,7 +227,7 @@ public:
      * @param mimeData Some mime data.
      * @param @ok Set to true or false on success or failure.
      */
-    static QList<WId> winIdsFromMimeData(const QMimeData *mimeData, bool *ok = 0);
+    static QList<WId> winIdsFromMimeData(const QMimeData *mimeData, bool *ok = nullptr);
 
 private:
     class Private;

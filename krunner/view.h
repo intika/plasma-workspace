@@ -20,7 +20,7 @@
 #define VIEW_H
 
 #include <QPointer>
-#include <QtQuick/QQuickView>
+#include <QQuickView>
 #include <KConfigGroup>
 #include <KSharedConfig>
 
@@ -50,7 +50,7 @@ class View : public PlasmaQuick::Dialog
     Q_PROPERTY(QStringList history READ history NOTIFY historyChanged)
 
 public:
-    explicit View(QWindow *parent = 0);
+    explicit View(QWindow *parent = nullptr);
     ~View() override;
 
     void positionOnScreen();

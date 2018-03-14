@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=Digital Clock
 Name[af]=Digitale horlosie
 Name[ar]=ساعة رقمية
@@ -87,6 +86,7 @@ Name[zh_CN]=数字钟
 Name[zh_TW]=數位時鐘
 
 Comment=Time displayed in a digital format
+Comment[ar]=الوقت بتنسيق رقميّ
 Comment[bs]=Vrijeme prikazano u digitalnom obliku
 Comment[ca]=Mostra l'hora en un format digital
 Comment[ca@valencia]=Mostra l'hora en un format digital

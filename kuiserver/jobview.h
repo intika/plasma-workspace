@@ -22,7 +22,7 @@
 #ifndef JOBVIEW_H
 #define JOBVIEW_H
 
-#include <QtDBus/QDBusObjectPath>
+#include <QDBusObjectPath>
 
 #include <kio/global.h>
 
@@ -64,7 +64,7 @@ public:
         Stopped = 2
     };
 
-    JobView(uint jobId, QObject *parent = nullptr);
+    explicit JobView(uint jobId, QObject *parent = nullptr);
     ~JobView() override;
 
     void terminate(const QString &errorMessage);

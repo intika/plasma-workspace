@@ -106,7 +106,7 @@ public:
     Q_ENUM(GroupMode)
 
     explicit TasksModel(QObject *parent = nullptr);
-    virtual ~TasksModel();
+    ~TasksModel() override;
 
     QHash<int, QByteArray> roleNames() const override;
 
@@ -734,7 +734,7 @@ public:
      * @param index An index in this tasks model.
      * @param activities The new list of activities.
      **/
-    Q_INVOKABLE virtual void requestActivities(const QModelIndex &index, const QStringList &activities) override;
+    Q_INVOKABLE void requestActivities(const QModelIndex &index, const QStringList &activities) override;
 
     /**
      * Request informing the window manager of new geometry for a visual
@@ -810,6 +810,17 @@ public:
      * child tasks.
      */
     Q_INVOKABLE QModelIndex makeModelIndex(int row, int childRow = -1) const;
+
+    /**
+     * Given a row in the model, returns a QPersistentModelIndex for it. To get an index
+     * for a child in a task group, an optional child row may be passed as well.
+     *
+     * @param row A row index in the model.
+     * @param childRow A row index for a child of the task group at the given row.
+     * @returns a model index for the task at the given row, or for one of its
+     * child tasks.
+     */
+    Q_INVOKABLE QPersistentModelIndex makePersistentModelIndex(int row, int childRow = -1) const;
 
     void classBegin() override;
     void componentComplete() override;

@@ -22,9 +22,8 @@
 
 #include "progresslistmodel.h"
 
-#include <QtCore/QList>
-#include <QtCore/QObject>
-
+#include <QList>
+#include <QObject>
 #include <QListView>
 #include <QPushButton>
 #include <QProgressBar>
@@ -44,7 +43,7 @@ public:
         editorHeight(0),
         iconWidth(0),
         listView(listView),
-        progressBar(new QProgressBar(0))
+        progressBar(new QProgressBar(nullptr))
     {
     }
 

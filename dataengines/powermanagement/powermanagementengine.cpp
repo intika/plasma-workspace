@@ -34,12 +34,12 @@
 
 #include <QDebug>
 
-#include <QtDBus/QDBusConnectionInterface>
-#include <QtDBus/QDBusError>
-#include <QtDBus/QDBusInterface>
-#include <QtDBus/QDBusMetaType>
-#include <QtDBus/QDBusReply>
-#include <QtDBus/QDBusPendingCallWatcher>
+#include <QDBusConnectionInterface>
+#include <QDBusError>
+#include <QDBusInterface>
+#include <QDBusMetaType>
+#include <QDBusReply>
+#include <QDBusPendingCallWatcher>
 
 #include <Plasma/DataContainer>
 #include "powermanagementservice.h"
@@ -379,7 +379,7 @@ Plasma::Service* PowermanagementEngine::serviceForSource(const QString &source)
         return new PowerManagementService(this);
     }
 
-    return 0;
+    return nullptr;
 }
 
 QString PowermanagementEngine::batteryStateToString(int newState) const

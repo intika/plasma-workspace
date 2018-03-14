@@ -34,7 +34,7 @@ class KSystemActivityDialog : public QDialog
 {
         Q_OBJECT
     public:
-        KSystemActivityDialog(QWidget *parent = NULL);
+        explicit KSystemActivityDialog(QWidget *parent = nullptr);
 
         /** Show the dialog and set the focus
          *
@@ -47,15 +47,14 @@ class KSystemActivityDialog : public QDialog
         void setFilterText(const QString &filterText);
         QString filterText() const;
 
+        QSize sizeHint() const override;
+
         /** Save the settings if the user presses the ESC key */
         void reject() override;
 
     protected:
         /** Save the settings if the user clicks (x) button on the window */
         void closeEvent(QCloseEvent *event) override;
-
-    private slots:
-        void slotInit();
 
     private:
         void saveDialogSettings();

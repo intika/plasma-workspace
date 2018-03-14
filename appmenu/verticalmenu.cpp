@@ -48,9 +48,9 @@ QMenu *VerticalMenu::leafMenu()
             leaf = act->menu();
             continue;
         }
-        return leaf == this ? 0 : leaf;
+        return leaf == this ? nullptr : leaf;
     }
-    return 0; // make gcc happy
+    return nullptr; // make gcc happy
 }
 
 void VerticalMenu::paintEvent(QPaintEvent *pe)
@@ -75,5 +75,3 @@ void VerticalMenu::_EVENT_##Event(Q##_TYPE_##Event *e) \
 
 FORWARD(keyPress, Key)
 FORWARD(keyRelease, Key)
-
-#include "verticalmenu.moc"

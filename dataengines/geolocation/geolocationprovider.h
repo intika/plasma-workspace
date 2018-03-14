@@ -18,9 +18,9 @@
 #ifndef GEOLOCATIONPROVIDER_H
 #define GEOLOCATIONPROVIDER_H
 
-#include <QtCore/QHash>
-#include <QtCore/QObject>
-#include <QtCore/QTimer>
+#include <QHash>
+#include <QObject>
+#include <QTimer>
 
 #include <Plasma/DataEngine>
 
@@ -36,7 +36,7 @@ public:
     enum UpdateTrigger { ForcedUpdate = 0, SourceEvent = 1, NetworkConnected = 2 };
     Q_DECLARE_FLAGS(UpdateTriggers, UpdateTrigger)
 
-    GeolocationProvider(QObject *parent = 0, const QVariantList &args = QVariantList());
+    explicit GeolocationProvider(QObject *parent = nullptr, const QVariantList &args = QVariantList());
     void init(Plasma::DataEngine::Data *data, EntryAccuracy *accuracies);
 
     UpdateTriggers updateTriggers() const;

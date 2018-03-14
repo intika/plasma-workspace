@@ -29,8 +29,8 @@ class QalculateEngine : public QObject
 {
 	Q_OBJECT
 public:
-	QalculateEngine(QObject* parent = nullptr);
-	~QalculateEngine();
+	explicit QalculateEngine(QObject* parent = nullptr);
+	~QalculateEngine() override;
 
 	QString lastResult() const { return m_lastResult; }
 

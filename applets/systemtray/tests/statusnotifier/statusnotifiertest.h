@@ -34,8 +34,8 @@ class StatusNotifierTest : public QDialog, public Ui_StatusNotifierTest
     Q_OBJECT
 
     public:
-        StatusNotifierTest(QWidget* parent = 0);
-        virtual ~StatusNotifierTest();
+        StatusNotifierTest(QWidget* parent = nullptr);
+        ~StatusNotifierTest() override;
 
         void init();
         void log(const QString &msg);

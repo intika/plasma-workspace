@@ -50,7 +50,7 @@ static const NET::Properties windowInfoFlags = NET::WMState | NET::XAWMState | N
 static const NET::Properties2 windowInfoFlags2 = NET::WM2DesktopFileName | NET::WM2Activities |
     NET::WM2WindowClass | NET::WM2AllowedActions;
 
-class XWindowTasksModel::Private
+class Q_DECL_HIDDEN XWindowTasksModel::Private
 {
 public:
     Private(XWindowTasksModel *q);
@@ -324,11 +324,16 @@ void XWindowTasksModel::Private::windowChanged(WId window, NET::Properties prope
     bool wipeAppDataCache = false;
     QVector<int> changedRoles;
 
-    if (properties & (NET::WMName | NET::WMVisibleName | NET::WMPid)
+    if (properties & (NET::WMPid)
         || properties2 & (NET::WM2DesktopFileName | NET::WM2WindowClass)) {
         wipeInfoCache = true;
         wipeAppDataCache = true;
-        changedRoles << Qt::DisplayRole << Qt::DecorationRole << AppId << AppName << GenericName << LauncherUrl << AppPid;
+        changedRoles << Qt::DecorationRole << AppId << AppName << GenericName << LauncherUrl << AppPid;
+    }
+
+    if (properties & (NET::WMName | NET::WMVisibleName)) {
+        changedRoles << Qt::DisplayRole;
+        wipeInfoCache = true;
     }
 
     if ((properties & NET::WMIcon) && usingFallbackIcon.contains(window)) {
@@ -505,7 +510,7 @@ QUrl XWindowTasksModel::Private::windowUrl(WId window)
     }
 
     return windowUrlFromMetadata(info->windowClassClass(),
-        NETWinInfo(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMPid, 0).pid(),
+        NETWinInfo(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMPid, NET::Properties2()).pid(),
         rulesConfig, info->windowClassName());
 }
 
@@ -588,7 +593,7 @@ QVariant XWindowTasksModel::data(const QModelIndex &index, int role) const
     } else if (role == MimeType) {
         return d->mimeType();
     } else if (role == MimeData) {
-        return QByteArray((char*)&window, sizeof(window));;
+        return QByteArray((char*)&window, sizeof(window));
     } else if (role == IsWindow) {
         return true;
     } else if (role == IsActive) {
@@ -815,10 +820,10 @@ void XWindowTasksModel::requestToggleMaximized(const QModelIndex &index)
         KWindowSystem::unminimizeWindow(window);
     }
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, NET::Properties2());
 
     if (restore) {
-        ni.setState(0, NET::Max);
+        ni.setState(NET::States(), NET::Max);
     } else {
         ni.setState(NET::Max, NET::Max);
     }
@@ -837,10 +842,10 @@ void XWindowTasksModel::requestToggleKeepAbove(const QModelIndex &index)
     const WId window = d->windows.at(index.row());
     const KWindowInfo *info = d->windowInfo(window);
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, NET::Properties2());
 
     if (info->hasState(NET::StaysOnTop)) {
-        ni.setState(0, NET::StaysOnTop);
+        ni.setState(NET::States(), NET::StaysOnTop);
     } else {
         ni.setState(NET::StaysOnTop, NET::StaysOnTop);
     }
@@ -855,10 +860,10 @@ void XWindowTasksModel::requestToggleKeepBelow(const QModelIndex &index)
     const WId window = d->windows.at(index.row());
     const KWindowInfo *info = d->windowInfo(window);
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, NET::Properties2());
 
     if (info->hasState(NET::KeepBelow)) {
-        ni.setState(0, NET::KeepBelow);
+        ni.setState(NET::States(), NET::KeepBelow);
     } else {
         ni.setState(NET::KeepBelow, NET::KeepBelow);
     }
@@ -873,10 +878,10 @@ void XWindowTasksModel::requestToggleFullScreen(const QModelIndex &index)
     const WId window = d->windows.at(index.row());
     const KWindowInfo *info = d->windowInfo(window);
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, NET::Properties2());
 
     if (info->hasState(NET::FullScreen)) {
-        ni.setState(0, NET::FullScreen);
+        ni.setState(NET::States(), NET::FullScreen);
     } else {
         ni.setState(NET::FullScreen, NET::FullScreen);
     }
@@ -891,10 +896,10 @@ void XWindowTasksModel::requestToggleShaded(const QModelIndex &index)
     const WId window = d->windows.at(index.row());
     const KWindowInfo *info = d->windowInfo(window);
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::WMState, NET::Properties2());
 
     if (info->hasState(NET::Shaded)) {
-        ni.setState(0, NET::Shaded);
+        ni.setState(NET::States(), NET::Shaded);
     } else {
         ni.setState(NET::Shaded, NET::Shaded);
     }
@@ -965,7 +970,7 @@ void XWindowTasksModel::requestPublishDelegateGeometry(const QModelIndex &index,
         return;
     }
 
-    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), 0, 0);
+    NETWinInfo ni(QX11Info::connection(), window, QX11Info::appRootWindow(), NET::Properties(), NET::Properties2());
     NETRect rect;
 
     if (geometry.isValid()) {

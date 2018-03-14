@@ -1,5 +1,4 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=Calendar
 Name[ar]=التقويم
 Name[be@latin]=Kalandar
@@ -78,6 +77,7 @@ Name[x-test]=xxCalendarxx
 Name[zh_CN]=日历
 Name[zh_TW]=行事曆
 Comment=Month display with your appointments and events
+Comment[ar]=عرض للشّهر فيه المواعيد والأحداث
 Comment[ca]=Mostra el mes amb les cites i els esdeveniments
 Comment[ca@valencia]=Mostra el mes amb les cites i els esdeveniments
 Comment[da]=Månedsvisning med dine aftaler og begivenheder
@@ -91,6 +91,7 @@ Comment[fr]=Vue mensuelle avec vos rendez-vous et évènements
 Comment[gl]=Pantalla do mes con citas e eventos.
 Comment[he]=תצוגה חודשית עם הפגישות והאירועים שלך
 Comment[hu]=Megjeleníti a hónapban esedékes időpontokat és eseményeket
+Comment[id]=Tayangan bulan dengan acara dan janjimu
 Comment[it]=Visualizzazione del mese con i tuoi appuntamenti ed eventi
 Comment[ko]=내 약속과 이벤트가 있는 달력 표시
 Comment[lt]=Jūsų užduotys ir įvykiai mėnesiui

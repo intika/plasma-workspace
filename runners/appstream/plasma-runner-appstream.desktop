@@ -38,7 +38,7 @@ Name[zh_CN]=软件中心
 Name[zh_TW]=軟體中心
 Comment=Lets you find software
 Comment[ca]=Permet cercar programari
-Comment[ca@valencia]=Permet buscar programari
+Comment[ca@valencia]=Permet cercar programari
 Comment[cs]=Umožní vám hledat software
 Comment[da]=Hjælper dig med at finde software
 Comment[de]=Unterstützt die Suche nach Software
@@ -77,7 +77,7 @@ Icon=applications-other
 Type=Service
 X-KDE-ServiceTypes=Plasma/Runner
 
-X-KDE-Library=appstreamrunner
+X-KDE-Library=krunner_appstream
 X-KDE-PluginInfo-Author=Aleix Pol Gonzalez
 X-KDE-PluginInfo-Email=aleixpol@blue-systems.com
 X-KDE-PluginInfo-Version=0.1

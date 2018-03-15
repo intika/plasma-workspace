@@ -189,6 +189,32 @@ void DesktopView::ensureWindowType()
     }
 }
 
+void DesktopView::setCandidateContainments(QList<Plasma::Containment *> containments)
+{
+    if (m_candidateContainments == containments) {
+        return;
+    }
+
+    m_candidateContainments = containments;
+    emit candidateContainmentsGraphicsChanged();
+}
+
+QList<Plasma::Containment *> DesktopView::candidateContainments() const
+{
+    return m_candidateContainments;
+}
+
+QList<QObject *> DesktopView::candidateContainmentsGraphics() const
+{
+    QList<QObject *> list;
+
+    for (auto cont : m_candidateContainments) {
+        list << cont->property("_plasma_graphicObject").value<QQuickItem *>();
+    }
+
+    return list;
+}
+
 DesktopView::SessionType DesktopView::sessionType() const
 {
     if (qobject_cast<ShellCorona *>(corona())) {
@@ -196,17 +222,6 @@ DesktopView::SessionType DesktopView::sessionType() const
     } else {
         return ApplicationSession;
     }
-}
-
-QQuickItem *DesktopView::containmentItemForActivity(const QString &activity)
-{
-    if (ShellCorona *c = qobject_cast<ShellCorona*>(corona())) {
-        Plasma::Containment *cont = c->containmentGraphicsItemPreview(activity, containment()->screen());
-        if (cont) {
-            return cont->property("_plasma_graphicObject").value<QQuickItem *>();
-        }
-    }
-    return nullptr;
 }
 
 bool DesktopView::event(QEvent *e)

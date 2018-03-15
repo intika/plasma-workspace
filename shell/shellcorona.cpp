@@ -1225,22 +1225,21 @@ void ShellCorona::addOutput(QScreen* screen)
         m_waitingPanelsTimer.start();
     }
 
+    QStringList existingActivities = m_activityController->activities();
+    QList<Plasma::Containment *>containments;
+    for (const auto &id : existingActivities) {
+        auto cont = createContainmentForActivity(id, containment->screen());
+        if (cont) {
+            containments << cont;
+        }
+        qWarning()<<"NERCHIAZIONEEEEE"<<cont;
+    }
+    view->setCandidateContainments(containments);
+
     emit availableScreenRectChanged();
     emit screenAdded(m_screenPool->id(screen->name()));
 
     CHECK_SCREEN_INVARIANTS
-}
-
-Plasma::Containment *ShellCorona::containmentGraphicsItemPreview(const QString& activity, int screenNum)
-{
-    if (m_desktopContainments.contains(activity)) {
-        for (Plasma::Containment *cont : m_desktopContainments.value(activity)) {
-            if (!cont->destroyed() && cont->lastScreen() == screenNum && cont->activity() == activity) {
-                return cont;
-            }
-        }
-    }
-    return nullptr;
 }
 
 Plasma::Containment *ShellCorona::createContainmentForActivity(const QString& activity, int screenNum)
@@ -1264,7 +1263,8 @@ Plasma::Containment *ShellCorona::createContainmentForActivity(const QString& ac
         plugin = defaultContainmentPlugin();
     }
 
-    Plasma::Containment *containment = containmentForScreen(screenNum, plugin, QVariantList());
+    Plasma::Containment *containment = containmentForScreen(screenNum, activity, plugin, QVariantList());
+
     Q_ASSERT(containment);
 
     if (containment) {
@@ -1563,6 +1563,10 @@ void ShellCorona::activityAdded(const QString &id)
     }
 
     m_activityContainmentPlugins.insert(id, defaultContainmentPlugin());
+
+    for (const auto desktopView : m_desktopViewforId) {
+        desktopView->setCandidateContainments(desktopView->candidateContainments() += createContainmentForActivity(id, desktopView->containment()->screen()));
+    }
 }
 
 void ShellCorona::activityRemoved(const QString &id)
@@ -1570,6 +1574,11 @@ void ShellCorona::activityRemoved(const QString &id)
     m_activityContainmentPlugins.remove(id);
     if (m_desktopContainments.contains(id)) {
         for (auto cont : m_desktopContainments.value(id)) {
+            for (const auto desktopView : m_desktopViewforId) {
+                auto conts = desktopView->candidateContainments();
+                conts.removeAll(cont);
+                desktopView->setCandidateContainments(conts);
+            }
             cont->destroy();
         }
     }
@@ -1608,7 +1617,7 @@ void ShellCorona::insertActivity(const QString &id, const QString &plugin)
 
 Plasma::Containment *ShellCorona::setContainmentTypeForScreen(int screen, const QString &plugin)
 {
-    Plasma::Containment *oldContainment = containmentForScreen(screen);
+    Plasma::Containment *oldContainment = containmentForScreen(screen, m_activityController->currentActivity());
 
     //no valid containment in given screen, giving up
     if (!oldContainment) {

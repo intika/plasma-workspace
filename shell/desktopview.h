@@ -40,6 +40,9 @@ class DesktopView : public PlasmaQuick::ContainmentView
 
     //What kind of plasma session we're in: are we in a full workspace, an application?...
     Q_PROPERTY(SessionType sessionType READ sessionType CONSTANT)
+
+    Q_PROPERTY(QList<QObject *> candidateContainments READ candidateContainmentsGraphics NOTIFY candidateContainmentsGraphicsChanged)
+
 public:
     enum WindowType {
         Window, /** The window is a normal resizable window with titlebar and appears in the taskbar */
@@ -70,15 +73,11 @@ public:
     WindowType windowType() const;
     void setWindowType(WindowType type);
 
-    SessionType sessionType() const;
+    void setCandidateContainments(QList<Plasma::Containment *> containments);
+    QList<Plasma::Containment *> candidateContainments() const;
+    QList<QObject *> candidateContainmentsGraphics() const;
 
-    /**
-     * Returns the graphic object for the containment that corresponds to
-     * a given activity in the same screen as us,
-     * It's not guaranteed to return a valid pointer and it may led to the graphic object
-     * initialization, so it's potentially memory and cpu intensive, use with care
-     */
-    Q_INVOKABLE QQuickItem *containmentItemForActivity(const QString &activity);
+    SessionType sessionType() const;
 
 protected:
     bool event(QEvent *e) override;
@@ -98,6 +97,7 @@ private Q_SLOTS:
 Q_SIGNALS:
     void stayBehindChanged();
     void windowTypeChanged();
+    void candidateContainmentsGraphicsChanged();
 
 private:
     void coronaPackageChanged(const KPackage::Package &package);
@@ -107,6 +107,7 @@ private:
     QPointer<PlasmaQuick::ConfigView> m_configView;
     QPointer<QScreen> m_oldScreen;
     QPointer<QScreen> m_screenToFollow;
+    QList<Plasma::Containment *> m_candidateContainments;
     WindowType m_windowType;
     KWayland::Client::PlasmaShellSurface *m_shellSurface;
 };

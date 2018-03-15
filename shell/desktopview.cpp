@@ -30,80 +30,16 @@
 #include <kwindowsystem.h>
 #include <klocalizedstring.h>
 #include <KAuthorized>
-#include <kactivities/info.h>
 
 #include <KPackage/Package>
 
 #include <KWayland/Client/plasmashell.h>
 #include <KWayland/Client/surface.h>
 
-ActivitiesModel::ActivitiesModel(QObject *parent)
-    : QStandardItemModel(parent)
-{
-    qmlRegisterType<ActivitiesModel>();
-    setSortRole(Name);
-}
-
-ActivitiesModel::~ActivitiesModel()
-{}
-
-void ActivitiesModel::addActivity(const QString &id, Plasma::Containment *containment)
-{
-    KActivities::Info *info = new KActivities::Info(id, this);
-    auto items = findItems(info->id());
-    if (items.length() > 0) {
-        qDebug()<<"double activity insertion attempted";
-        info->deleteLater();
-        return;
-    }
-
-    QStandardItem *item = new QStandardItem;    
-    item->setData(id, Id);
-    item->setData(info->name(), Name);
-    item->setData(info->isCurrent(), Current);
-    item->setData(containment->property("_plasma_graphicObject"), Containment);
-    appendRow(item);
-    sort(Name);
-
-    connect(info, &KActivities::Info::nameChanged, this, [this, info]() {
-        const auto &items = findItems(info->id());
-        //length should always be 1
-        if (items.length() > 0) {
-            items.first()->setData(info->name(), Name);
-        }
-        sort(Name);
-    });
-    connect(info, &KActivities::Info::isCurrentChanged, this, [this, info]() {
-        auto items = findItems(info->id());
-        if (items.length() > 0) {
-            items.first()->setData(info->isCurrent(), Current);
-        }
-    });
-    connect(info, &KActivities::Info::removed, this, [this, info]() {
-        auto items = findItems(info->id());
-        if (items.length() > 0) {
-            removeRows(items.first()->row(), 1);
-        }
-        info->deleteLater(); 
-    });
-}
-
-QHash<int, QByteArray> ActivitiesModel::roleNames() const
-{
-    QHash<int, QByteArray> roles;
-    roles[Id] = "id";
-    roles[Name] = "name";
-    roles[Current] = "current";
-    roles[Containment] = "containment";
-    return roles;
-}
-
-
 DesktopView::DesktopView(Plasma::Corona *corona, QScreen *targetScreen)
     : PlasmaQuick::ContainmentView(corona, nullptr),
       m_windowType(Desktop),
-      m_shellSurface(nullptr),
-      m_activitiesModel(new ActivitiesModel(this))
+      m_shellSurface(nullptr)
 {
     if (targetScreen) {
         setScreenToFollow(targetScreen);
@@ -262,15 +198,9 @@ DesktopView::SessionType DesktopView::sessionType() const
     }
 }
 
-ActivitiesModel *DesktopView::activitiesModel() const
-{
-    return m_activitiesModel;
-}
-
 QQuickItem *DesktopView::containmentItemForActivity(const QString &activity)
 {
-    ShellCorona *c = qobject_cast<ShellCorona*>(corona());
-    if (c && containment()) {
+    if (ShellCorona *c = qobject_cast<ShellCorona*>(corona())) {
         Plasma::Containment *cont = c->containmentGraphicsItemPreview(activity, containment()->screen());
         if (cont) {
             return cont->property("_plasma_graphicObject").value<QQuickItem *>();

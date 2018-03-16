@@ -121,8 +121,10 @@ PlasmaCore.ColorScope {
                     }
                 }
             }
-Rectangle {
+FastBlur {
     anchors.fill: parent
+    source: wallpaper
+    radius: 120
     opacity: lockScreenRoot.uiVisible ? 1 : 0
     Behavior on opacity {
         PropertyAnimation {
@@ -130,8 +132,19 @@ Rectangle {
             duration: 2000
         }
     }
-    color: "steelblue"
 }
+Rectangle {
+    anchors.fill: parent
+    opacity: lockScreenRoot.uiVisible ? 0.6 : 0
+    Behavior on opacity {
+        PropertyAnimation {
+            easing.type: Easing.OutCubic
+            duration: 2000
+        }
+    }
+    color: "black"
+}
+
         Clock {
             id: clock
             anchors.horizontalCenter: parent.horizontalCenter

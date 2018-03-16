@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import QtQuick 2.5
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
+import QtGraphicalEffects 1.0
 
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
@@ -68,13 +69,27 @@ PlasmaCore.ColorScope {
         visible: false
     }
 
-    Item {
+    MouseArea {
         id: lockScreenRoot
 
+        property bool uiVisible: false
         x: parent.x
         y: parent.y
         width: parent.width
         height: parent.height
+        hoverEnabled: true
+        onPressed: uiVisible = true
+        onPositionChanged: uiVisible = true
+        onUiVisibleChanged: {
+            if (uiVisible) {
+                fadeoutTimer.restart();
+            }
+        }
+        Timer {
+            id: fadeoutTimer
+            interval: 5000
+            onTriggered: lockScreenRoot.uiVisible = false;
+        }
 
         Component.onCompleted: PropertyAnimation { id: launchAnimation; target: lockScreenRoot; property: "opacity"; from: 0; to: 1; duration: 1000 }
 
@@ -106,13 +121,31 @@ PlasmaCore.ColorScope {
                     }
                 }
             }
-
+Rectangle {
+    anchors.fill: parent
+    opacity: lockScreenRoot.uiVisible ? 1 : 0
+    Behavior on opacity {
+        PropertyAnimation {
+            easing.type: Easing.OutCubic
+            duration: 2000
+        }
+    }
+    color: "steelblue"
+}
         Clock {
             id: clock
             anchors.horizontalCenter: parent.horizontalCenter
             y: (mainBlock.userList.y + mainStack.y)/2 - height/2
             visible: y > 0
             Layout.alignment: Qt.AlignBaseline
+            layer.enabled: !lockScreenRoot.uiVisible
+            layer.effect: DropShadow {
+                horizontalOffset: 0
+                verticalOffset: 1
+                radius: 12
+                samples: 32
+                color: Qt.rgba(0, 0, 0, 0.5)
+            }
         }
 
         ListModel {
@@ -127,9 +160,15 @@ PlasmaCore.ColorScope {
             }
         }
 
-
         StackView {
             id: mainStack
+            opacity: lockScreenRoot.uiVisible ? 1 : 0
+            Behavior on opacity {
+                PropertyAnimation {
+                    easing.type: Easing.OutCubic
+                    duration: units.longDuration
+                }
+            }
             anchors {
                 left: parent.left
                 right: parent.right
@@ -357,6 +396,13 @@ PlasmaCore.ColorScope {
 
         RowLayout {
             id: footer
+            opacity: lockScreenRoot.uiVisible ? 1 : 0
+            Behavior on opacity {
+                PropertyAnimation {
+                    easing.type: Easing.OutCubic
+                    duration: units.longDuration
+                }
+            }
             anchors {
                 bottom: parent.bottom
                 left: parent.left

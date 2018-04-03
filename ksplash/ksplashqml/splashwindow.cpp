@@ -120,20 +120,31 @@ void SplashWindow::setGeometry(const QRect& rect)
     KQuickAddons::QuickViewSharedEngine::setGeometry(rect);
 
     if (oldGeometryEmpty) {
-
-        KPackage::Package package = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/LookAndFeel"));
-        KConfigGroup cg(KSharedConfig::openConfig(QStringLiteral("kdeglobals")), "KDE");
-        const QString packageName = cg.readEntry("LookAndFeelPackage", QString());
-        if (!packageName.isEmpty()) {
-            package.setPath(packageName);
-        }
-
+        bool loaded = false;
         if (!m_theme.isEmpty()) {
-            package.setPath(m_theme);
+            KPackage::Package splashPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/SplashScreen"));
+            splashPackage.setPath(m_theme);
+            if (splashPackage.isValid()) {
+                setSource(QUrl::fromLocalFile(splashPackage.filePath("splashmainscript")));
+                loaded = splashPackage.isValid();
+            }
         }
+        
+        if (!loaded) {
+            KPackage::Package lnfPackage = KPackage::PackageLoader::self()->loadPackage(QStringLiteral("Plasma/LookAndFeel"));
+            KConfigGroup cg(KSharedConfig::openConfig(QStringLiteral("kdeglobals")), "KDE");
+            const QString packageName = cg.readEntry("LookAndFeelPackage", QString());
+            if (!packageName.isEmpty()) {
+                lnfPackage.setPath(packageName);
+            }
 
-        Q_ASSERT(package.isValid());
-        setSource(QUrl::fromLocalFile(package.filePath("splashmainscript")));
+            if (!m_theme.isEmpty()) {
+                lnfPackage.setPath(m_theme);
+            }
+
+            Q_ASSERT(lnfPackage.isValid());
+            setSource(QUrl::fromLocalFile(lnfPackage.filePath("splashmainscript")));
+        }
     }
 
     if (m_shellSurface) {
